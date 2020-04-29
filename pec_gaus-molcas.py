@@ -339,7 +339,48 @@ def WriteMovie(inp, symb, NewCoord):
 
 
 
-
+def get_energy(level):
+    E=[]
+    c=0
+    files=sorted(glob.iglob('*.log')) # Used to get all files in numerical order
+    for file in files:
+        energy=0.0
+        for i in open( file ).readlines():
+            
+            if level == "RASSCF":
+                if re.search(r"::    RASSCF root number", i) is not None: # Find energy in .log
+                    words = i.split()
+                    energy = float( words[7] )  # Energy is the sixth word
+                    E.append(energy)
+                    
+            elif level == "CASPT2":
+                if re.search(r"::    CASPT2 Root", i) is not None: # Find energy in .log
+                    words = i.split()
+                    energy = float( words[6] )  # Energy is the sixth word
+                    E.append(energy)
+                    
+            elif level == "MS-CASPT2":
+                if re.search(r":    MS-CASPT2 Root", i) is not None: # Find energy in .log
+                    words = i.split()
+                    energy = float( words[6] )  # Energy is the sixth word
+                    E.append(energy)
+                
+            elif level == "RASSI":
+                if re.search(r"::    RASSI State ", i) is not None: # Find energy in .log
+                    words = i.split()
+                    energy = float( words[6] )  # Energy is the sixth word
+                    E.append(energy)
+            else:
+                print("You forgot something, right? Maybe... level of calculation???")
+                exit()
+            
+        if energy == 0.0:
+            E.append(energy)
+            
+        c=c+1
+        if c == 1:
+            nstates=len(E)
+    return E, nstates
 
 
 # MAIN PROGRAM
